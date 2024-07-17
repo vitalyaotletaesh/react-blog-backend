@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import mongoose from 'mongoose'
 import multer from 'multer'
+import cors from 'cors'
 
 import {
 	create,
@@ -12,6 +13,7 @@ import {
 	register,
 	remove,
 	update,
+	getLastTags,
 } from './controllers/index.js'
 import { checkAuth, handleValidationError } from './utils/index.js'
 import {
@@ -35,6 +37,7 @@ const upload = multer({ storage })
 
 app.use(express.json())
 app.use('/uploads', express.static('uploads'))
+app.use(cors())
 
 mongoose
 	.connect(process.env.DB_CONNECT)
@@ -51,6 +54,7 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 	})
 })
 
+app.get('/posts/tags', getLastTags)
 app.post('/posts', checkAuth, postValidation, handleValidationError, create)
 app.get('/posts', getAll)
 app.get('/posts/:id', getOne)

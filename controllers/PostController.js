@@ -60,6 +60,8 @@ export const getOne = async (req, res) => {
 				new: true,
 			}
 		)
+			.populate('user')
+			.exec()
 
 		if (!post) {
 			return res.status(404).json({
@@ -89,8 +91,11 @@ export const remove = async (req, res) => {
 			})
 		}
 
+		const posts = await PostModel.find().populate('user').exec()
+
 		res.status(200).json({
 			message: 'Статья успешно удалена',
+			posts,
 		})
 	} catch (error) {
 		console.log(error)
@@ -130,6 +135,28 @@ export const update = async (req, res) => {
 		console.log(error)
 		res.status(500).json({
 			message: 'Ошибка при обновлении статьи',
+		})
+	}
+}
+
+export const getLastTags = async (req, res) => {
+	try {
+		const posts = await PostModel.find().limit(5).exec()
+		const tags = posts.map((post) => post.tags).flat().slice(0, 5)
+
+		if (!tags) {
+			return res.status(400).json({
+				message: 'Тэги не найдены',
+			})
+		}
+
+		res.status(200).json({
+			tags,
+		})
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({
+			message: 'Не удалось получить тэги',
 		})
 	}
 }
